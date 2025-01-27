@@ -30,7 +30,7 @@ scenario = st.selectbox(
     ("Pharmaceutical Research", "Green Chemistry", "Polymer Science")
 )
 # Configure the API key directly in the script
-API_KEY = 'AIzaSyB-R8anJJ2jUpUXPsfhCyFGih33Wthfhvw'
+API_KEY = 'AIzaSyABZIvTNYeIjXRzee_J2pJlJn7MgIl-jlA'
 genai.configure(api_key=API_KEY)
 
 # Generation configuration
@@ -51,7 +51,7 @@ safety_settings = [
 ]
 
 # Model name
-MODEL_NAME = "gemini-1.5-pro-latest"
+MODEL_NAME = "gemini-1.5-flash"
 
 
 # Create the model
