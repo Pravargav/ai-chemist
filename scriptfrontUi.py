@@ -30,7 +30,7 @@ scenario = st.selectbox(
     ("Pharmaceutical Research", "Green Chemistry", "Polymer Science")
 )
 # Configure the API key directly in the script
-API_KEY = 'AIzaSyA7d2e-_BIkYs3SNgyOEAtzWTi5ZI4eI1c'
+API_KEY = 'AIzaSyA1W0c1xaEhr4ttylVCIuNWPIlQ0OubAYY'
 genai.configure(api_key=API_KEY)
 
 # Generation configuration
