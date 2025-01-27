@@ -51,7 +51,7 @@ safety_settings = [
 ]
 
 # Model name
-MODEL_NAME = "gemini-1.5-pro-latest"
+MODEL_NAME = "gemini-1.5-flash"
 
 
 # Create the model
