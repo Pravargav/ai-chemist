@@ -120,7 +120,8 @@ def main():
             st.write("Generating Results..")
             prompt = t+target+constraints+stability
             response = send_message_to_model(prompt, impaths)
-            st.write(response)
+            single_line_response = response.split('.')[0] + '.' if '.' in response else response
+            st.write(single_line_response)
 
 
 if __name__ == "__main__":
