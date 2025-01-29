@@ -38,7 +38,7 @@ generation_config = {
     "temperature": 0.2,
     "top_p": 0.95,
     "top_k": 32,
-    "max_output_tokens": 500,
+    "max_output_tokens": 1000,
     "response_mime_type": "text/plain",
 }
 
@@ -111,17 +111,16 @@ def main():
      
     if st.button("Run AI Chemist Simulation"):
             if(scenario=="Pharmaceutical Research"):
-                t="Generate a list of potential compounds and environmentally benign synthesis methods. monitor the reactions in real-time, ensuring that the processes minimize waste and energy consumption. provide insights into the biodegradability and toxicity of the products, helping  develop a sustainable pesticide that meets regulatory standards and is safe for the environment."
+                t=""
             elif(scenario=="Polymer Science"):
-                t="Suggest various monomers and polymerization techniques. Give recommendations, synthesizing the polymers in her lab. the real-time monitoring capabilities should allow us to adjust reaction parameters to optimize polymer properties. Provide immediate feedback on the tensile strength and thermal stability of the polymers, enabling  to iterate quickly and achieve the desired material characteristics."
+                t=""
             elif(scenario=="Green Chemistry"):
-                t="Generate a list of potential compounds and environmentally benign synthesis methods.  monitor the reactions in real-time, ensuring that the processes minimize waste and energy consumption. Provide insights into the biodegradability and toxicity of the products, helping  develop a sustainable pesticide that meets regulatory standards and is safe for the environment."
+                t=""
     
             st.write("Generating Results..")
             prompt = t+target+constraints+stability
             response = send_message_to_model(prompt, impaths)
-            single_line_response = response.split('.')[0] + '.' if '.' in response else response
-            st.write(single_line_response)
+            st.write(response)
 
 
 if __name__ == "__main__":
