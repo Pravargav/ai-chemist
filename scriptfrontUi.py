@@ -1,43 +1,34 @@
-
 import pathlib
 from PIL import Image
 import google.generativeai as genai
 import streamlit as st
 import os
 
-# Function for scenario-specific suggestions
-def ai_chemist_simulation(scenario):
-    if scenario == "Pharmaceutical Research":
-      target = st.text_input(f"target_bacterial_enzymes {scenario}:")
-      constraints=""
-      stability=""
-    elif scenario == "Green Chemistry":
-      target = st.text_input(f"target_properties_of_pesticides {scenario}:")
-      constraints = st.text_input(f"environmental_constraints {scenario}:")
-      stability=""
-    elif scenario == "Polymer Science":
-      target = st.text_input(f"target_mechanical_properties {scenario}:")
-      constraints=""
-      stability = st.text_input(f"chemical_stability {scenario}:")
-    return target,constraints,stability
+# Function to gather user input based on cuisine type
+def recipe_input(cuisine):
+    main_ingredient = st.text_input(f"Main ingredient for {cuisine}:")
+    dietary_preference = st.text_input(f"Dietary preferences (optional) for {cuisine}:")
+    cooking_time = st.text_input(f"Preferred cooking time (in minutes) for {cuisine}:")
+    return main_ingredient, dietary_preference, cooking_time
 
 # Streamlit App Layout
-st.title("AI Chemist Assistance.")
+st.title("AI-Powered Recipe Generator")
 
-# Select scenario
-scenario = st.selectbox(
-    "Select a Scenario",
-    ("Pharmaceutical Research", "Green Chemistry", "Polymer Science")
+# Select cuisine type
+cuisine = st.selectbox(
+    "Select a Cuisine Type",
+    ("Italian", "Indian", "Mexican", "Chinese", "French")
 )
+
 # Configure the API key directly in the script
 API_KEY = 'AIzaSyDkICa6LXV50JdSChVkjj9JrU6edWzrEgc'
 genai.configure(api_key=API_KEY)
 
 # Generation configuration
 generation_config = {
-    "temperature": 0.2,
-    "top_p": 0.95,
-    "top_k": 32,
+    "temperature": 0.5,
+    "top_p": 0.9,
+    "top_k": 40,
     "max_output_tokens": 1000,
     "response_mime_type": "text/plain",
 }
@@ -53,7 +44,6 @@ safety_settings = [
 # Model name
 MODEL_NAME = "gemini-1.5-flash"
 
-
 # Create the model
 model = genai.GenerativeModel(
     model_name=MODEL_NAME,
@@ -63,65 +53,53 @@ model = genai.GenerativeModel(
 
 # Start a chat session
 chat_session = model.start_chat(history=[])
-target,constraints,stability= ai_chemist_simulation(scenario) 
-uploaded_files = st.file_uploader("Choose images...", type=["jpg", "jpeg", "png"],  accept_multiple_files=True)
-impaths=[]
-idx=2
-if uploaded_files is not None:
+
+# Get user inputs
+main_ingredient, dietary_preference, cooking_time = recipe_input(cuisine)
+
+# File uploader for ingredient images
+uploaded_files = st.file_uploader("Upload images of ingredients...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+image_paths = []
+index = 1
+
+if uploaded_files:
     for img in uploaded_files:
         try:
-            # Load and display the image
             image = Image.open(img)
             st.image(image, use_column_width=True)
-
-            # Convert image to RGB mode if it has an alpha channel
+            
             if image.mode == 'RGBA':
                 image = image.convert('RGB')
-
-            # Save the uploaded image temporarily
-            idx+=2
-            temp_image_path = pathlib.Path(f"temp_image_{idx}.jpg")
-            image.save(temp_image_path, format="JPEG")
-            impaths.append(temp_image_path)
-            # Generate UI description
             
+            temp_image_path = pathlib.Path(f"temp_image_{index}.jpg")
+            image.save(temp_image_path, format="JPEG")
+            image_paths.append(temp_image_path)
+            index += 1
         except Exception as e:
-            st.error(f"An error occurred: {e}")
-# Function to send a message to the model
+            st.error(f"Error processing image: {e}")
 
+# Function to send a message to the model
 def send_message_to_model(message, image_paths):
     image_inputs = []
     
     for image_path in image_paths:
-      print(image_path)
-      
-      image_input = {
-          'mime_type': 'image/jpeg',
-          'data': pathlib.Path(image_path).read_bytes()
-      }
-      image_inputs.append(image_input)
-      os.remove(image_path)
-    # Combine the message and image inputs
+        image_input = {
+            'mime_type': 'image/jpeg',
+            'data': pathlib.Path(image_path).read_bytes()
+        }
+        image_inputs.append(image_input)
+        os.remove(image_path)
+    
     response = chat_session.send_message([message] + image_inputs)
     return response.text
 
-# Streamlit app
+# Streamlit app logic
 def main():
-    
-     
-    if st.button("Run AI Chemist Simulation"):
-            if(scenario=="Pharmaceutical Research"):
-                t=""
-            elif(scenario=="Polymer Science"):
-                t=""
-            elif(scenario=="Green Chemistry"):
-                t=""
-    
-            st.write("Generating Results..")
-            prompt = t+target+constraints+stability
-            response = send_message_to_model(prompt, impaths)
-            st.write(response)
-
+    if st.button("Generate Recipe"):
+        st.write("Generating Recipe...")
+        prompt = f"Generate a {cuisine} recipe using {main_ingredient}. Consider {dietary_preference} dietary preference and a cooking time of {cooking_time} minutes."
+        response = send_message_to_model(prompt, image_paths)
+        st.write(response)
 
 if __name__ == "__main__":
     main()
